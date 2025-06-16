@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Send, Bot, User, Loader2 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import ApiStatus from './api-status'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -25,6 +26,7 @@ export default function ChatInterface() {
   ])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isDemoMode, setIsDemoMode] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
 
@@ -55,6 +57,7 @@ export default function ChatInterface() {
     setIsLoading(true)
 
     try {
+      console.log('Sending message to API...');
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -68,30 +71,53 @@ export default function ChatInterface() {
         }),
       })
 
+      console.log('Response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error('Failed to get response')
+        const errorData = await response.json().catch(() => ({}));
+        console.error('API Error:', errorData);
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`)
       }
 
       const data = await response.json()
+      console.log('API Response:', data);
+      
+      // Check if we're in demo mode
+      if (data.demo) {
+        setIsDemoMode(true)
+      }
       
       if (data.error) {
-        throw new Error(data.error)
+        throw new Error(`${data.error}${data.details ? ` - ${data.details}` : ''}`)
       }
 
       const assistantMessage: Message = {
         role: 'assistant',
         content: data.message,
-        timestamp: data.timestamp
+        timestamp: data.timestamp || new Date().toISOString()
       }
 
       setMessages(prev => [...prev, assistantMessage])
     } catch (error) {
       console.error('Chat error:', error)
+      
+      // Show detailed error message
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
+      
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to send message',
+        title: 'Chat Error',
+        description: errorMessage,
         variant: 'destructive'
       })
+      
+      // Add error message to chat for visibility
+      const errorChatMessage: Message = {
+        role: 'assistant',
+        content: `❌ Error: ${errorMessage}`,
+        timestamp: new Date().toISOString()
+      }
+      
+      setMessages(prev => [...prev, errorChatMessage])
     } finally {
       setIsLoading(false)
     }
@@ -114,9 +140,16 @@ export default function ChatInterface() {
   return (
     <Card className="w-full max-w-4xl mx-auto h-[600px] flex flex-col">
       <CardHeader className="border-b">
-        <CardTitle className="flex items-center gap-2">
-          <Bot className="w-5 h-5" />
-          AI Chat Assistant
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Bot className="w-5 h-5" />
+            AI Chat Assistant
+          </div>
+          {isDemoMode && (
+            <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+              Demo Mode
+            </span>
+          )}
         </CardTitle>
       </CardHeader>
       
@@ -206,3 +239,8 @@ export default function ChatInterface() {
     </Card>
   )
 }
+
+
+
+
+

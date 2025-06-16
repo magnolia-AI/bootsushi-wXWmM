@@ -1,36 +1,45 @@
-# Next.js Template Project
+# AI Chat Assistant
 
-This is a versatile template for building web applications with Next.js and Tailwind CSS. It includes a responsive layout, theme switching, and various UI components to help you get started quickly.
+A modern AI-powered chatbot application built with Next.js 15, OpenAI API, and beautiful UI components. Experience intelligent conversations with a sleek, responsive interface.
 
 ## Features
 
-- 🎨 Responsive layout with header and footer
-- 🌓 Dark/light mode with theme switching
-- 📱 Mobile-friendly navigation
-- 🧩 Pre-built UI components
-- 🚀 Performance optimized
-- 🔍 SEO-friendly structure
+- 🤖 AI-powered chat using OpenAI's GPT models
+- 💬 Real-time conversation interface
+- 🎨 Modern, responsive design with animations
+- 🌓 Dark/light mode support
+- 📱 Mobile-friendly chat experience
+- ⚡ Fast and optimized performance
+- 🔒 Secure API handling
 
 ## Getting Started
 
 1. Clone this repository or use it as a template
 2. Install dependencies:
    ```bash
+   bun install
+   # or
    npm install
-   # or
-   yarn install
-   # or
-   pnpm install
    ```
-3. Run the development server:
+
+3. Set up your OpenAI API key:
    ```bash
-   npm run dev
-   # or
-   yarn dev
-   # or
-   pnpm dev
+   cp .env.example .env.local
    ```
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+   Then edit `.env.local` and add your OpenAI API key:
+   ```
+   OPENAI_API_KEY=your_actual_api_key_here
+   ```
+   Get your API key from: https://platform.openai.com/api-keys
+
+4. Run the development server:
+   ```bash
+   bun dev
+   # or
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser and start chatting!
 
 ## Customization
 
@@ -56,3 +65,5 @@ To learn more about the technologies used in this template:
 ## License
 
 This template is MIT licensed.
+
+
